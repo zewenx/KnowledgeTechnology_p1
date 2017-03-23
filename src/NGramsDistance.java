@@ -19,10 +19,10 @@ public class NGramsDistance {
 			List <String> strs = FileUtils.readLines(new File("testFiles/train.txt"));
 			for (String string : strs) {
 				String[]temp = string.split("	");
-				new Ngram().getSimilarity(temp[0], temp[1], 2);			
+				System.out.println(new Ngram().getSimilarity(temp[0], temp[1], 2));			
 				
 			}
-			output(ans);
+//			output(ans);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

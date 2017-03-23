@@ -1,24 +1,30 @@
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.codec.EncoderException;
+import org.apache.commons.codec.language.Soundex;
 import org.apache.commons.io.FileUtils;
 
-public class GlobleEditDistance {
-	
-	public static void main(String[] args) {
-		new GlobleEditDistance().run(args);
-	}
+public class SoundexToGenerateSpecialPairs {
+	static Soundex mSoundex = new Soundex();
+	static List<String> specialPairs = new ArrayList<String>();
 
+	public static void main(String[] args) {
+
+		new SoundexToGenerateSpecialPairs().run(args);
+	}
 	public void run(String[] args) {
-		int [] ans = new int[19];
+		int [] ans = new int[10];
 		try {
 			List <String> strs = FileUtils.readLines(new File("testFiles/train.txt"));
 			for (String string : strs) {
 				String[]temp = string.split("	");
-				ans[minDistance(temp[0], temp[1])]++;
+				int similarity = difference(temp[0], temp[1]);
+				if (similarity == 4) {
+					ans[minDistance(temp[0], temp[1])]++;
+				}
+//				ans[similarity]++;
 			}
 			output(ans);
 			
@@ -28,17 +34,7 @@ public class GlobleEditDistance {
 		}
 		
 	}
-
-	private void output(int[] ans) {
-		double sum =0;
-		for (int i : ans) {
-			sum+=i;
-		}
-		for(int i = 0 ;i<19;i++){
-			System.out.println(ans[i]/sum);
-		}
-	}
-
+	
 	public int minDistance(String word1, String word2) {
         int length_1 = word1.length();
         int length_2 = word2.length();
@@ -55,6 +51,15 @@ public class GlobleEditDistance {
                     ans[i][j]=getMinAns(ans[i-1][j-1],ans[i-1][j]+1,ans[i][j-1]+1);
                 else {
                     ans[i][j]=getMinAns(ans[i-1][j-1]+1,ans[i-1][j]+1,ans[i][j-1]+1);
+                    if (ans[i-1][j-1]+1 == ans[i][j] && ans[i-1][j]+1>ans[i][j]&&ans[i][j-1]+1>ans[i][j]) {
+                    	String pair = ""+word1.toLowerCase().charAt(i-1)+word2.charAt(j-1);
+                    	String c_pair = ""+word2.charAt(j-1)+word1.toLowerCase().charAt(i-1);
+                    	
+                    	if (!specialPairs.contains(pair)&&!specialPairs.contains(c_pair)) {
+                    		specialPairs.add(pair);
+						}
+                    	
+					}
                 }
             }
         }
@@ -77,4 +82,33 @@ public class GlobleEditDistance {
             ans[i][0]= i;
         }
     }
+	
+	private void output(int[] ans) {
+		double sum =0;
+		for (int i : ans) {
+			sum+=i;
+		}
+		for(int i = 0 ;i<10;i++){
+			System.out.println(ans[i]/sum);
+		}
+		int count=0;
+		for(String pair : specialPairs){
+			System.out.println(pair);
+			count++;
+		}
+		System.out.println(count);
+	}
+
+	
+	// return 0-4 , 4 refers to extremely similar
+	int difference(String str1,String str2){
+		try {
+			return mSoundex.difference(str1, str2);
+		} catch (EncoderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
 }

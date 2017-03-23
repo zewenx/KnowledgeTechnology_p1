@@ -2,25 +2,34 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
-public class GlobleEditDistance {
+public class ModifiedGlobleEditDistance {
 	
 	public static void main(String[] args) {
-		new GlobleEditDistance().run(args);
+		new ModifiedGlobleEditDistance().run(args);
 	}
 
 	public void run(String[] args) {
-		int [] ans = new int[19];
+		Map<Double, Integer> results = new HashMap<Double, Integer>();
 		try {
 			List <String> strs = FileUtils.readLines(new File("testFiles/train.txt"));
 			for (String string : strs) {
 				String[]temp = string.split("	");
-				ans[minDistance(temp[0], temp[1])]++;
+				double result = minDistance(temp[0], temp[1]);
+				if (results.containsKey(result)) {
+					results.put(result, results.get(result)+1);
+				}else{
+					results.put(result, 1);
+				}
+				
 			}
-			output(ans);
+			output(results);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -29,17 +38,21 @@ public class GlobleEditDistance {
 		
 	}
 
-	private void output(int[] ans) {
+	private void output(Map<Double, Integer> results) {
 		double sum =0;
-		for (int i : ans) {
-			sum+=i;
+		Collection<Double> keySet = results.keySet();
+		Object[] keyArray = (Object[]) keySet.toArray();
+		Arrays.sort(keyArray);
+		for (Object i : keyArray) {
+			sum+=results.get(i);
 		}
-		for(int i = 0 ;i<19;i++){
-			System.out.println(ans[i]/sum);
+		
+		for(Object i : keyArray){
+			System.out.println(i + "   "+ results.get(i)/sum);
 		}
 	}
 
-	public int minDistance(String word1, String word2) {
+	public double minDistance(String word1, String word2) {
         int length_1 = word1.length();
         int length_2 = word2.length();
         if (length_1==0|length_2==0){
@@ -47,14 +60,14 @@ public class GlobleEditDistance {
         }
 
 
-        int [][] ans = new int [length_1+1][length_2+1];
+        double [][] ans = new double [length_1+1][length_2+1];
         init(ans,length_1,length_2);
         for (int i =1;i<=length_1;i++){
             for (int j = 1;j<=length_2;j++){
                 if (word1.toLowerCase().charAt(i-1) == word2.charAt(j-1))
-                    ans[i][j]=getMinAns(ans[i-1][j-1],ans[i-1][j]+1,ans[i][j-1]+1);
+                    ans[i][j]=getMinAns(ans[i-1][j-1],ans[i-1][j]+1.0,ans[i][j-1]+1.0);
                 else {
-                    ans[i][j]=getMinAns(ans[i-1][j-1]+1,ans[i-1][j]+1,ans[i][j-1]+1);
+                    ans[i][j]=getMinAns(ans[i-1][j-1]+0.5,ans[i-1][j]+1,ans[i][j-1]+1);
                 }
             }
         }
@@ -63,12 +76,12 @@ public class GlobleEditDistance {
 
     }
 
-    private int getMinAns(int i, int i1, int i2) {
-        int ans = Math.min(i,i1);
+    private double getMinAns(double i, double i1, double i2) {
+    	double ans = Math.min(i,i1);
         return Math.min(ans,i2);
     }
 
-    private void init(int[][] ans,int length_1,int length_2) {
+    private void init(double[][] ans,int length_1,int length_2) {
         for (int i =0;i<length_1+1;i++){
             for (int j = 0;j<length_2+1;j++){
                 ans[i][j] = 0;;
