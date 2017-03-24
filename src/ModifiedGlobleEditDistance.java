@@ -65,9 +65,9 @@ public class ModifiedGlobleEditDistance {
         for (int i =1;i<=length_1;i++){
             for (int j = 1;j<=length_2;j++){
                 if (word1.toLowerCase().charAt(i-1) == word2.charAt(j-1))
-                    ans[i][j]=getMinAns(ans[i-1][j-1],ans[i-1][j]+1.0,ans[i][j-1]+1.0);
+                    ans[i][j]=getMinAns(ans[i-1][j-1]-1,ans[i-1][j]+1.0,ans[i][j-1]+1.0);
                 else {
-                    ans[i][j]=getMinAns(ans[i-1][j-1]+0.5,ans[i-1][j]+1,ans[i][j-1]+1);
+                    ans[i][j]=getMinAns(ans[i-1][j-1]+1,ans[i-1][j]+1,ans[i][j-1]+1);
                 }
             }
         }

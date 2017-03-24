@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +98,13 @@ public class SoundexToGenerateSpecialPairs {
 			count++;
 		}
 		System.out.println(count);
+	
+		try {
+			FileUtils.writeLines(new File("testFiles/specialPairs.txt"), specialPairs);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	
