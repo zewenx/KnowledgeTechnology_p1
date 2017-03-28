@@ -39,7 +39,8 @@ public class SoundexMethod {
 			sum+=i;
 		}
 		for(int i = 0 ;i<10;i++){
-			System.out.println(ans[i]/sum);
+			
+			System.out.println(ans[i]+"  "+ans[i]/sum);
 		}
 	}
 

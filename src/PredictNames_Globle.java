@@ -7,24 +7,24 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 public class PredictNames_Globle extends ModifiedGlobleEditDistance {
-	
+
 	HashMap<String, String> nameMaps = new HashMap<>();
 	HashMap<String, String> testMap = new HashMap<>();
-	
+
 	public static void main(String[] args) {
 		new PredictNames_Globle().run(args);
 	}
-	
+
 	@Override
 	public void run(String[] args) {
 
-		int [] ans = new int[19];
+		int[] ans = new int[19];
 		try {
-			List <String> names = FileUtils.readLines(new File("testFiles/names.txt"));
-			List <String> tests = FileUtils.readLines(new File("testFiles/test.txt"));
-			
-			generateNameMap(names,tests);
-			
+			List<String> names = FileUtils.readLines(new File("testFiles/names.txt"));
+			List<String> tests = FileUtils.readLines(new File("testFiles/test.txt"));
+
+			generateNameMap(names, tests);
+
 			evaluate();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -34,18 +34,22 @@ public class PredictNames_Globle extends ModifiedGlobleEditDistance {
 
 	private void generateNameMap(List<String> names, List<String> tests) {
 		double currentScore = 100;
+		boolean set = false;
 		for (String test : tests) {
 			test = test.split("	")[0];
-			for(String name : names){
-				
-				double distance = minDistance(test,name);
-				if (distance<currentScore) {
+			for (String name : names) {
+				double distance = minDistance(test, name);
+				if (distance < currentScore && distance < 0) {
 					currentScore = distance;
 					nameMaps.put(test, name);
+					set = true;
 				}
-				
 			}
-			currentScore =100;
+			if (!set) {
+				nameMaps.put(test, "");
+			}
+			set = false;
+			currentScore = 100;
 		}
 	}
 
@@ -54,25 +58,33 @@ public class PredictNames_Globle extends ModifiedGlobleEditDistance {
 		List<String> strs;
 		try {
 			strs = FileUtils.readLines(new File("testFiles/train.txt"));
-			int hits = 0 ;
-			double sum =0;
-			
+			int hits = 0;
+			double sum = 0;
+
 			for (String string : strs) {
-				String[]temp = string.split("	");
+				String[] temp = string.split("	");
 				testMap.put(temp[0], temp[1]);
 			}
-			for(String string2 : nameMaps.keySet()){
-				if(nameMaps.get(string2).equals(testMap.get(string2))){
-					hits ++;  //49
+			for (String string2 : nameMaps.keySet()) {
+				if (nameMaps.get(string2).equals(testMap.get(string2))) {
+					hits++; // 48
 				}
-				sum+=1;      //1960
+				sum += 1; // 1960
 			}
-			System.out.println(hits/sum);
+			System.out.println(hits / sum);
+			int count =0;
+			for (String string2 : nameMaps.keySet()) {
+				if (nameMaps.get(string2)=="") {
+					count ++;
+				}
+				
+			}
+			System.out.println(count);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }
