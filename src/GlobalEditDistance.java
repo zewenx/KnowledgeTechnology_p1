@@ -6,10 +6,10 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
-public class GlobleEditDistance {
+public class GlobalEditDistance {
 	
 	public static void main(String[] args) {
-		new GlobleEditDistance().run(args);
+		new GlobalEditDistance().run(args);
 	}
 
 	public void run(String[] args) {

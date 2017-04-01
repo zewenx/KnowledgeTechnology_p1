@@ -14,7 +14,7 @@ public class SoundexMethod {
 	}
 	public void run(String[] args) {
 		int [] ans = new int[10];
-		GlobleEditDistance globleEditDistance = new GlobleEditDistance();
+		GlobalEditDistance globleEditDistance = new GlobalEditDistance();
 		try {
 			List <String> strs = FileUtils.readLines(new File("testFiles/train.txt"));
 			for (String string : strs) {

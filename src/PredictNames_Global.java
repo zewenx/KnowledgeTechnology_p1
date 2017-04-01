@@ -2,23 +2,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
-public class PredictNames_GlobleSpecialPairs extends SpecialPairsGolbleEditDistance {
+public class PredictNames_Global extends ModifiedGlobalEditDistance {
 
-	HashMap<String, List<String>> nameMapsTemp = new HashMap<>();
 	HashMap<String, String> nameMaps = new HashMap<>();
 	HashMap<String, String> testMap = new HashMap<>();
-
 	public int count = 0;
-	int cores = 10;
-	
+	int cores = 20;
 	public static void main(String[] args) {
-		new PredictNames_GlobleSpecialPairs().run(args);
+		new PredictNames_Global().run(args);
 	}
 
 	@Override
@@ -29,10 +24,8 @@ public class PredictNames_GlobleSpecialPairs extends SpecialPairsGolbleEditDista
 			List<String> names = FileUtils.readLines(new File("testFiles/names.txt"));
 			List<String> tests = FileUtils.readLines(new File("testFiles/train.txt"));
 
-			Map<Double, Integer> results = new HashMap<Double, Integer>();
-			specialPairs = FileUtils.readLines(new File("testFiles/specialPairs.txt"));
-
 			generateNameMap(names, tests);
+
 			evaluate();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -51,8 +44,8 @@ public class PredictNames_GlobleSpecialPairs extends SpecialPairsGolbleEditDista
 				@Override
 				public void run() {
 					System.out.println(count);
+					double currentScore = 100;
 					boolean set = false;
-					double different = 100;
 					int end = (count + 1) * length;
 					if (count == cores - 1) {
 						end = tests.size();
@@ -62,24 +55,23 @@ public class PredictNames_GlobleSpecialPairs extends SpecialPairsGolbleEditDista
 						test = test.split("	")[0];
 						for (String name : names) {
 							double distance = minDistance(test, name);
-							
-							if (different>distance && distance < 0) {
+							if (distance < currentScore && distance < 0) {
+								currentScore = distance;
 								nameMaps.put(test, name);
-								different = distance;
-								set=true;
+								set = true;
 							}
 						}
 						if (!set) {
 							nameMaps.put(test, "");
 						}
 						set = false;
-						different = 100;
+						currentScore = 100;
 					}
 					poolManager.decrease();
 				}
 			});
 			try {
-				Thread.sleep(500);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -87,16 +79,14 @@ public class PredictNames_GlobleSpecialPairs extends SpecialPairsGolbleEditDista
 		}
 		while (poolManager.count != 0){
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(30000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		poolManager.fixedThreadPool.shutdown();
-		
 	}
-
 
 	private void evaluate() {
 		// TODO Auto-generated method stub
@@ -106,22 +96,23 @@ public class PredictNames_GlobleSpecialPairs extends SpecialPairsGolbleEditDista
 			int hits = 0;
 			double sum = 0;
 			int failedCount = 0;
-
+			
 			for (String string : strs) {
 				String[] temp = string.split("	");
 				testMap.put(temp[0], temp[1]);
 			}
 			for (String string2 : nameMaps.keySet()) {
 				if (nameMaps.get(string2).equals(testMap.get(string2))) {
-					hits++; // 49
+					hits++; // 48
 				}
 				sum += 1; // 1960
 				if (nameMaps.get(string2).equals("")) {
-					failedCount++;
+					failedCount ++;
 				}
 			}
 			System.out.println(hits / sum);
-			
+			int count = 0;
+
 			ArrayList<String> list = new ArrayList<String>();
 			list.add("hits : "+hits);
 			list.add("sum  : "+sum);
@@ -130,7 +121,7 @@ public class PredictNames_GlobleSpecialPairs extends SpecialPairsGolbleEditDista
 			for(String key : nameMaps.keySet()){
 				list.add(key +"  "+ nameMaps.get(key));
 			}
-			FileUtils.writeLines(new File("testFiles/predictions_GlobalSpecialPairs.txt"),list);
+			FileUtils.writeLines(new File("testFiles/predictions_Global.txt"),list);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

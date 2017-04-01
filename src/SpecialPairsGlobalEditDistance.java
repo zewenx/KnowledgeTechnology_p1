@@ -11,13 +11,13 @@ import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.language.Soundex;
 import org.apache.commons.io.FileUtils;
 
-public class SpecialPairsGolbleEditDistance {
+public class SpecialPairsGlobalEditDistance {
 	static Soundex mSoundex = new Soundex();
 	static List<String> specialPairs = new ArrayList<String>();
 
 	public static void main(String[] args) {
 
-		new SpecialPairsGolbleEditDistance().run(args);
+		new SpecialPairsGlobalEditDistance().run(args);
 	}
 
 	public void run(String[] args) {

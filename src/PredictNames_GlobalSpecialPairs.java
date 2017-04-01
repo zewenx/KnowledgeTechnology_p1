@@ -6,23 +6,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.codec.language.Soundex;
 import org.apache.commons.io.FileUtils;
 
-public class PredictNames_GlobleWithSoundex extends SpecialPairsGolbleEditDistance {
+public class PredictNames_GlobalSpecialPairs extends SpecialPairsGlobalEditDistance {
 
+	HashMap<String, List<String>> nameMapsTemp = new HashMap<>();
 	HashMap<String, String> nameMaps = new HashMap<>();
 	HashMap<String, String> testMap = new HashMap<>();
 
 	public int count = 0;
-	int cores = 9;
-
+	int cores = 10;
+	
 	public static void main(String[] args) {
-		new PredictNames_GlobleWithSoundex().run(args);
+		new PredictNames_GlobalSpecialPairs().run(args);
 	}
 
 	@Override
 	public void run(String[] args) {
+
 		int[] ans = new int[19];
 		try {
 			List<String> names = FileUtils.readLines(new File("testFiles/names.txt"));
@@ -51,7 +52,7 @@ public class PredictNames_GlobleWithSoundex extends SpecialPairsGolbleEditDistan
 				public void run() {
 					System.out.println(count);
 					boolean set = false;
-					double currentResult = 0;
+					double different = 100;
 					int end = (count + 1) * length;
 					if (count == cores - 1) {
 						end = tests.size();
@@ -60,11 +61,11 @@ public class PredictNames_GlobleWithSoundex extends SpecialPairsGolbleEditDistan
 						String test = tests.get(j);
 						test = test.split("	")[0];
 						for (String name : names) {
-							double result = calculateValue(test, name);
+							double distance = minDistance(test, name);
 							
-							if (result > currentResult) {
-								currentResult = result;
+							if (different>distance && distance < 0) {
 								nameMaps.put(test, name);
+								different = distance;
 								set=true;
 							}
 						}
@@ -72,7 +73,7 @@ public class PredictNames_GlobleWithSoundex extends SpecialPairsGolbleEditDistan
 							nameMaps.put(test, "");
 						}
 						set = false;
-						currentResult = 0;
+						different = 100;
 					}
 					poolManager.decrease();
 				}
@@ -95,18 +96,8 @@ public class PredictNames_GlobleWithSoundex extends SpecialPairsGolbleEditDistan
 		poolManager.fixedThreadPool.shutdown();
 		
 	}
-	
-	double calculateValue(String word1, String word2){
-		double distance = minDistance(word1, word2);
-		double length_1 = word1.length();
-		double length_2 = word2.length();
-		double length = Math.max(length_1, length_2);
-		int similarity = difference(word1, word2);
-		double result = -distance/length * 0.6 + similarity/4.0 * 0.4;
-		return result;
-	}
 
-	
+
 	private void evaluate() {
 		// TODO Auto-generated method stub
 		List<String> strs;
@@ -125,11 +116,12 @@ public class PredictNames_GlobleWithSoundex extends SpecialPairsGolbleEditDistan
 					hits++; // 49
 				}
 				sum += 1; // 1960
-				if (nameMaps.get(string2)=="") {
+				if (nameMaps.get(string2).equals("")) {
 					failedCount++;
 				}
 			}
 			System.out.println(hits / sum);
+			
 			ArrayList<String> list = new ArrayList<String>();
 			list.add("hits : "+hits);
 			list.add("sum  : "+sum);
@@ -138,7 +130,7 @@ public class PredictNames_GlobleWithSoundex extends SpecialPairsGolbleEditDistan
 			for(String key : nameMaps.keySet()){
 				list.add(key +"  "+ nameMaps.get(key));
 			}
-			FileUtils.writeLines(new File("testFiles/predictions_GlobalWithSoundex.txt"),list);
+			FileUtils.writeLines(new File("testFiles/predictions_GlobalSpecialPairs.txt"),list);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

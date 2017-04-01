@@ -10,11 +10,11 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
 
-public class ModifiedGlobleEditDistance{
+public class ModifiedGlobalEditDistance{
 
 	
 	public static void main(String[] args) {
-		new ModifiedGlobleEditDistance().run(args);
+		new ModifiedGlobalEditDistance().run(args);
 	}
 
 	public void run(String[] args) {
