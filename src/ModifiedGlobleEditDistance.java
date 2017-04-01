@@ -6,10 +6,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
 
-public class ModifiedGlobleEditDistance {
+public class ModifiedGlobleEditDistance{
+
 	
 	public static void main(String[] args) {
 		new ModifiedGlobleEditDistance().run(args);
@@ -55,6 +57,8 @@ public class ModifiedGlobleEditDistance {
 	public double minDistance(String word1, String word2) {
         int length_1 = word1.length();
         int length_2 = word2.length();
+        word1 = word1.toLowerCase();
+		word2 = word2.toLowerCase();
         if (length_1==0|length_2==0){
             return length_1+length_2;
         }
@@ -64,7 +68,7 @@ public class ModifiedGlobleEditDistance {
         init(ans,length_1,length_2);
         for (int i =1;i<=length_1;i++){
             for (int j = 1;j<=length_2;j++){
-                if (word1.toLowerCase().charAt(i-1) == word2.charAt(j-1))
+                if (word1.charAt(i-1) == word2.charAt(j-1))
                     ans[i][j]=getMinAns(ans[i-1][j-1]-1,ans[i-1][j]+1.0,ans[i][j-1]+1.0);
                 else {
                     ans[i][j]=getMinAns(ans[i-1][j-1]+1,ans[i-1][j]+1,ans[i][j-1]+1);
